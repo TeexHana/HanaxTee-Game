@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>For Hana 💕</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Pacifico&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: 'Quicksand', 'Fredoka', system-ui, sans-serif;
+      background: #1a0d1a;
+      color: #fff;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .screen {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .screen.hidden { opacity: 0; pointer-events: none; transform: scale(0.98); }
+
+    /* ============ START SCREEN ============ */
+    #start-screen {
+      background: linear-gradient(160deg, #ffb3d9 0%, #ffd1e8 40%, #fff0f7 100%);
+      text-align: center;
+      padding: 24px;
+    }
+    #start-screen::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.6) 0 6px, transparent 7px),
+        radial-gradient(circle at 70% 20%, rgba(255,255,255,0.5) 0 4px, transparent 5px),
+        radial-gradient(circle at 40% 70%, rgba(255,255,255,0.5) 0 5px, transparent 6px),
+        radial-gradient(circle at 85% 65%, rgba(255,255,255,0.6) 0 3px, transparent 4px),
+        radial-gradient(circle at 10% 85%, rgba(255,255,255,0.5) 0 4px, transparent 5px);
+      pointer-events: none;
+      animation: twinkle 3s ease-in-out infinite;
+    }
+    @keyframes twinkle { 0%,100% { opacity: 0.6 } 50% { opacity: 1 } }
+
+    .title-wrap { position: relative; z-index: 2; }
+    .title {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(48px, 9vw, 96px);
+      color: #d6336c;
+      text-shadow: 0 4px 0 #fff, 0 8px 30px rgba(214,51,108,0.4);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: clamp(16px, 2.5vw, 22px);
+      color: #862e9b;
+      font-weight: 500;
+      margin-bottom: 36px;
+    }
+    .start-btn {
+      font-family: 'Fredoka', sans-serif;
+      font-size: clamp(20px, 3vw, 26px);
+      font-weight: 600;
+      background: linear-gradient(135deg, #ff4081, #ff80ab);
+      color: white;
+      border: none;
+      padding: 18px 48px;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 8px 0 #c2185b, 0 12px 30px rgba(255,64,129,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: 1px;
+    }
+    .start-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 0 #c2185b, 0 14px 36px rgba(255,64,129,0.5); }
+    .start-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 #c2185b, 0 6px 16px rgba(255,64,129,0.3); }
+
+    .hint {
+      margin-top: 28px;
+      font-size: 14px;
+      color: #ad1457;
+      opacity: 0.85;
+    }
+    .hint kbd {
+      background: white;
+      border: 2px solid #ff80ab;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      color: #c2185b;
+    }
+
+    /* ============ GAME SCREEN ============ */
+    #game-screen {
+      background: #87ceeb;
+    }
+    #hud {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.4), transparent);
+      z-index: 50;
+      pointer-events: none;
+    }
+    #level-name {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 18px;
+      color: white;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+    #hearts-counter {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 18px;
+      color: white;
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(6px);
+      padding: 6px 16px;
+      border-radius: 20px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    #world {
+      position: absolute; inset: 0;
+      overflow: hidden;
+    }
+    #camera {
+      position: absolute;
+      width: 100%; height: 100%;
+      will-change: transform;
+    }
+    .sky {
+      position: absolute; left: 0; top: 0;
+      width: 3000px; height: 100%;
+      transition: background 1.2s ease;
+    }
+    .ground {
+      position: absolute; bottom: 0; left: 0;
+      width: 3000px; height: 90px;
+      background: linear-gradient(180deg, #8bc34a 0%, #689f38 60%, #4a7c2a 100%);
+      box-shadow: inset 0 8px 0 #9ccc65;
+    }
+    .ground::before {
+      content: '';
+      position: absolute; top: -18px; left: 0; right: 0;
+      height: 24px;
+      background-image: radial-gradient(circle at 20px 24px, #8bc34a 12px, transparent 13px);
+      background-size: 40px 24px;
+      background-repeat: repeat-x;
+    }
+    .deco {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    /* Hello Kitty character */
+    #character {
+      position: absolute;
+      bottom: 90px;
+      left: 0;
+      width: 90px;
+      height: 110px;
+      z-index: 20;
+      will-change: transform;
+      transition: filter 0.2s;
+    }
+    #character.facing-left { transform: scaleX(-1); }
+    #character.walking svg { animation: walk 0.4s ease-in-out infinite; }
+    @keyframes walk {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-6px) rotate(2deg); }
+    }
+
+    .item {
+      position: absolute;
+      bottom: 110px;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      cursor: pointer;
+      z-index: 10;
+      animation: float 2.4s ease-in-out infinite, glow 1.6s ease-in-out infinite;
+      filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.6));
+      transition: transform 0.2s;
+    }
+    .item:hover { transform: scale(1.15); }
+    .item.collected {
+      animation: collect 0.6s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.6)); }
+      50% { filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.9)); }
+    }
+    @keyframes collect {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(2) translateY(-40px); opacity: 1; }
+      100% { transform: scale(0) translateY(-80px); opacity: 0; }
+    }
+
+    .portal {
+      position: absolute;
+      bottom: 90px;
+      width: 90px; height: 130px;
+      z-index: 5;
+      display: flex; align-items: center; justify-content: center;
+      animation: portalPulse 2s ease-in-out infinite;
+    }
+    .portal::before {
+      content: '';
+      position: absolute;
+      width: 70px; height: 110px;
+      background: radial-gradient(ellipse, rgba(255,255,255,0.95), rgba(255,182,193,0.4) 50%, transparent 80%);
+      border-radius: 50%;
+      filter: blur(4px);
+    }
+    .portal-text {
+      position: relative;
+      font-family: 'Pacifico', cursive;
+      color: #d6336c;
+      font-size: 18px;
+      text-shadow: 0 2px 0 white;
+      animation: bounce 1.2s ease-in-out infinite;
+    }
+    @keyframes portalPulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.08) } }
+    @keyframes bounce { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+
+    /* Floating bubble that shows level messages */
+    .bubble {
+      position: absolute;
+      bottom: 220px;
+      left: 80px;
+      background: white;
+      color: #c2185b;
+      padding: 14px 22px;
+      border-radius: 20px;
+      border: 3px solid #ff80ab;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      font-size: 16px;
+      max-width: 280px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      z-index: 30;
+      opacity: 0;
+      transform: translateY(10px) scale(0.9);
+      transition: all 0.4s ease;
+      pointer-events: none;
+    }
+    .bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -14px; left: 30px;
+      border: 10px solid transparent;
+      border-top-color: white;
+      filter: drop-shadow(0 3px 0 #ff80ab);
+    }
+    .bubble.show { opacity: 1; transform: translateY(0) scale(1); }
+    .bubble .close {
+      position: absolute; top: 4px; right: 8px;
+      cursor: pointer; color: #ff80ab; font-weight: 700;
+    }
+
+    /* Mobile controls */
+    #touch-controls {
+      position: absolute;
+      bottom: 18px; left: 0; right: 0;
+      display: none;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 18px;
+      z-index: 40;
+      pointer-events: none;
+    }
+    .ctrl-group { display: flex; gap: 10px; pointer-events: auto; }
+    .ctrl-btn {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(6px);
+      border: 2px solid rgba(255,255,255,0.8);
+      font-size: 26px;
+      color: #c2185b;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .ctrl-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.85); }
+    @media (max-width: 768px), (pointer: coarse) {
+      #touch-controls { display: flex; }
+      #hud { padding: 8px 12px; }
+      #level-name { font-size: 14px; }
+      #hearts-counter { font-size: 14px; padding: 4px 12px; }
+    }
+
+    /* ============ LEVEL COMPLETE OVERLAY ============ */
+    #level-complete {
+      background: radial-gradient(circle, rgba(255,192,203,0.95), rgba(255,105,180,0.9));
+      backdrop-filter: blur(8px);
+      text-align: center;
+      padding: 32px;
+    }
+    .lc-card {
+      background: white;
+      padding: 40px 48px;
+      border-radius: 32px;
+      max-width: 520px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: pop 0.5s ease;
+    }
+    @keyframes pop { 0% { transform: scale(0.5); opacity: 0 } 100% { transform: scale(1); opacity: 1 } }
+    .lc-emoji { font-size: 64px; margin-bottom: 8px; }
+    .lc-title {
+      font-family: 'Pacifico', cursive;
+      font-size: 38px;
+      color: #d6336c;
+      margin-bottom: 12px;
+    }
+    .lc-msg {
+      font-size: 17px;
+      color: #5d2a4d;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .lc-btn {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #ff4081, #ff80ab);
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #c2185b;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .lc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #c2185b; }
+    .lc-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #c2185b; }
+
+    /* ============ GAME COMPLETE ============ */
+    #game-complete {
+      background: linear-gradient(160deg, #1a0033 0%, #2d1b4e 50%, #4a1942 100%);
+      text-align: center;
+      padding: 24px;
+    }
+    #game-complete::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, white 0 2px, transparent 3px),
+        radial-gradient(circle at 30% 60%, white 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 50% 30%, white 0 2px, transparent 3px),
+        radial-gradient(circle at 70% 70%, white 0 1px, transparent 2px),
+        radial-gradient(circle at 90% 40%, white 0 2px, transparent 3px),
+        radial-gradient(circle at 20% 85%, white 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 80% 15%, white 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 60% 85%, white 0 1px, transparent 2px);
+      animation: twinkle 4s ease-in-out infinite;
+    }
+    .gc-content { position: relative; z-index: 2; }
+    .gc-line1 {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: clamp(32px, 7vw, 64px);
+      color: #ffd700;
+      text-shadow: 0 0 30px rgba(255,215,0,0.6), 0 4px 0 #b8860b;
+      letter-spacing: 4px;
+      animation: glow 2s ease-in-out infinite;
+    }
+    .gc-line2 {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(28px, 6vw, 56px);
+      color: #ff80ab;
+      text-shadow: 0 0 24px rgba(255,128,171,0.6);
+      margin-top: 12px;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 30px rgba(255,215,0,0.6), 0 4px 0 #b8860b; }
+      50% { text-shadow: 0 0 50px rgba(255,215,0,0.9), 0 4px 0 #b8860b; }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .gc-msg {
+      font-size: 18px;
+      color: #ffb3d9;
+      margin-top: 28px;
+      font-weight: 500;
+    }
+    .secret-heart {
+      margin-top: 40px;
+      font-size: 72px;
+      cursor: pointer;
+      animation: heartBeat 1.2s ease-in-out infinite;
+      filter: drop-shadow(0 0 30px rgba(255,64,129,0.8));
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+    .secret-heart:hover { transform: scale(1.2); }
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.15); }
+      50% { transform: scale(0.95); }
+      75% { transform: scale(1.1); }
+    }
+    .secret-hint {
+      font-size: 14px;
+      color: rgba(255,179,217,0.6);
+      margin-top: 16px;
+      font-style: italic;
+    }
+
+    /* ============ FINAL REVEAL PAGE ============ */
+    #final-page {
+      background: linear-gradient(160deg, #ffd1e8 0%, #ffeef7 50%, #fff5fb 100%);
+      padding: 32px 20px;
+      overflow-y: auto;
+    }
+    #final-page::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 25%, rgba(255,255,255,0.7) 0 4px, transparent 5px),
+        radial-gradient(circle at 75% 15%, rgba(255,255,255,0.6) 0 3px, transparent 4px),
+        radial-gradient(circle at 45% 75%, rgba(255,255,255,0.6) 0 5px, transparent 6px),
+        radial-gradient(circle at 90% 60%, rgba(255,255,255,0.5) 0 3px, transparent 4px);
+      pointer-events: none;
+      animation: twinkle 3s ease-in-out infinite;
+    }
+    .final-content {
+      position: relative;
+      z-index: 2;
+      max-width: 640px;
+      width: 100%;
+      background: white;
+      border-radius: 32px;
+      padding: 48px 40px;
+      box-shadow: 0 20px 60px rgba(214,51,108,0.25);
+      text-align: center;
+      margin: 20px 0;
+    }
+    .final-hello {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(36px, 6vw, 52px);
+      color: #d6336c;
+      margin-bottom: 8px;
+    }
+    .final-emoji-row { font-size: 28px; margin: 8px 0 24px; letter-spacing: 6px; }
+    .final-letter {
+      font-size: 17px;
+      line-height: 1.8;
+      color: #4a1942;
+      text-align: left;
+      font-weight: 500;
+    }
+    .final-letter p { margin-bottom: 16px; }
+    .final-sign {
+      font-family: 'Pacifico', cursive;
+      font-size: 28px;
+      color: #d6336c;
+      margin-top: 24px;
+    }
+    .final-forever {
+      margin-top: 24px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 20px;
+      color: #c2185b;
+      font-weight: 600;
+    }
+    .replay-btn {
+      margin-top: 0;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      background: transparent;
+      color: #d6336c;
+      border: 2px solid #ff80ab;
+      padding: 10px 24px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .replay-btn:hover { background: #ff80ab; color: white; }
+
+    /* Confetti */
+    .confetti {
+      position: fixed; width: 10px; height: 14px;
+      pointer-events: none; z-index: 100;
+      animation: confettiFall 3s linear forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(-20px) rotate(0); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* Floating hearts on final page */
+    .floating-heart {
+      position: fixed;
+      pointer-events: none;
+      font-size: 24px;
+      animation: floatUp 4s ease-out forwards;
+      z-index: 50;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.5); opacity: 0; }
+      20% { opacity: 1; }
+      100% { transform: translateY(-100vh) scale(1.2); opacity: 0; }
+    }
+
+    /* SVG styling for Hello Kitty */
+    .hk-svg { width: 100%; height: 100%; overflow: visible; }
+
+    /* ============ PHOTO GALLERY ============ */
+    .gallery-screen {
+      background: linear-gradient(160deg, #fff0f7 0%, #ffe4f0 45%, #f6e8ff 100%);
+      align-items: flex-start;
+      justify-content: flex-start;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0;
+    }
+    .gallery-screen::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,0.8) 0 4px, transparent 5px),
+        radial-gradient(circle at 78% 12%, rgba(255,255,255,0.7) 0 3px, transparent 4px),
+        radial-gradient(circle at 42% 82%, rgba(255,255,255,0.7) 0 5px, transparent 6px),
+        radial-gradient(circle at 88% 66%, rgba(255,255,255,0.6) 0 3px, transparent 4px);
+      pointer-events: none;
+      animation: twinkle 3s ease-in-out infinite;
+    }
+    .gallery-wrap {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .gallery-head { text-align: center; margin-bottom: 34px; }
+    .gallery-title {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(30px, 6vw, 52px);
+      color: #d6336c;
+      text-shadow: 0 3px 0 #fff, 0 8px 24px rgba(214,51,108,0.28);
+      line-height: 1.1;
+    }
+    .gallery-sub {
+      font-size: 15px;
+      color: #862e9b;
+      font-weight: 500;
+      margin-top: 10px;
+    }
+
+    /* polaroid grid */
+    .gallery-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 30px 24px;
+    }
+    .gallery-grid:empty { display: none; }
+
+    .polaroid {
+      display: block;
+      width: 100%;
+      margin: 0;
+      background: white;
+      padding: 12px 12px 8px;
+      border-radius: 6px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.18);
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .polaroid:nth-child(3n+1) { transform: rotate(-1.6deg); }
+    .polaroid:nth-child(3n+2) { transform: rotate(1.2deg); }
+    .polaroid:nth-child(3n)   { transform: rotate(-0.6deg); }
+    .polaroid:hover {
+      transform: rotate(0deg) scale(1.03) translateY(-4px);
+      box-shadow: 0 18px 40px rgba(214,51,108,0.28);
+      z-index: 5;
+    }
+    .polaroid-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 3px;
+      background: linear-gradient(135deg, #ffeef7, #fff0f7);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px;
+    }
+    .polaroid-img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .polaroid:hover .polaroid-img img { transform: scale(1.05); }
+    .polaroid figcaption {
+      margin-top: 10px;
+      text-align: center;
+      font-family: 'Pacifico', cursive;
+      font-size: 14px;
+      color: #c2185b;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    /* empty state */
+    .gallery-empty {
+      grid-column: 1 / -1;
+      justify-self: center;
+      background: white;
+      border-radius: 24px;
+      padding: 40px 32px;
+      text-align: center;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 16px 44px rgba(214,51,108,0.18);
+    }
+    .gallery-empty-icon { font-size: 54px; margin-bottom: 10px; }
+    .gallery-empty-title {
+      font-family: 'Pacifico', cursive;
+      font-size: 24px;
+      color: #d6336c;
+      margin-bottom: 12px;
+    }
+    .gallery-empty-text {
+      font-size: 15px;
+      color: #5d2a4d;
+      line-height: 1.7;
+      font-weight: 500;
+      text-align: left;
+    }
+    .gallery-empty-text code {
+      background: #ffeef7;
+      color: #c2185b;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .gallery-btn {
+      margin-top: 0;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #ff4081, #ff80ab);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #c2185b, 0 10px 26px rgba(255,64,129,0.32);
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.5px;
+    }
+    .gallery-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #c2185b, 0 14px 32px rgba(255,64,129,0.42); }
+    .gallery-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #c2185b; }
+
+    .final-actions {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .gallery-back {
+      margin-top: 22px;
+      margin-bottom: 8px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      background: transparent;
+      color: #d6336c;
+      border: 2px solid #ff80ab;
+      padding: 10px 26px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .gallery-back:hover { background: #ff80ab; color: white; }
+
+    /* ============ LIGHTBOX ============ */
+    .lightbox {
+      position: fixed; inset: 0;
+      background: rgba(26, 13, 26, 0.93);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 24px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-figure {
+      max-width: min(88vw, 900px);
+      max-height: 84vh;
+      text-align: center;
+      animation: pop 0.35s ease;
+    }
+    .lightbox-figure img {
+      max-width: 100%;
+      max-height: 72vh;
+      object-fit: contain;
+      border-radius: 10px;
+      background: white;
+      padding: 10px;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.6);
+    }
+    .lightbox-figure figcaption {
+      margin-top: 16px;
+      font-family: 'Pacifico', cursive;
+      font-size: 18px;
+      color: #ffb3d9;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 18px; right: 20px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.5);
+      color: white;
+      font-size: 26px;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 2;
+      transition: background 0.2s;
+    }
+    .lightbox-close:hover { background: #ff4081; border-color: #ff4081; }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.5);
+      color: white;
+      font-size: 30px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .lightbox-nav:hover { background: #ff4081; border-color: #ff4081; }
+    .lightbox-prev { left: 16px; }
+    .lightbox-next { right: 16px; }
+    @media (max-width: 700px) {
+      .lightbox-nav { width: 42px; height: 42px; font-size: 24px; }
+      .lightbox-prev { left: 6px; }
+      .lightbox-next { right: 6px; }
+    }
+
+    @media (max-width: 900px) { .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
+    @media (max-width: 520px) {
+      .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px 16px; }
+      .gallery-wrap { padding: 32px 14px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ START SCREEN ============ -->
+  <div id="start-screen" class="screen">
+    <div class="title-wrap">
+      <div class="title">Hana, my love 💕</div>
+      <div class="subtitle">A little game I made just for you ✨</div>
+      <button class="start-btn" id="start-btn">Press Start ▶</button>
+      <div class="hint">
+        Move with <kbd>←</kbd> <kbd>→</kbd> or <kbd>A</kbd> <kbd>D</kbd> &nbsp;•&nbsp; Jump with <kbd>Space</kbd> / <kbd>↑</kbd>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ GAME SCREEN ============ -->
+  <div id="game-screen" class="screen hidden">
+    <div id="hud">
+      <div id="level-name">Level 1</div>
+      <div id="hearts-counter">💕 0 / 0</div>
+    </div>
+    <div id="world">
+      <div id="camera">
+        <div class="sky" id="sky"></div>
+        <div id="decorations"></div>
+        <div id="items-layer"></div>
+        <div id="character">
+          <svg class="hk-svg" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+            <!-- Ears -->
+            <ellipse cx="38" cy="28" rx="10" ry="18" fill="#fff" stroke="#1a1a1a" stroke-width="2.5"/>
+            <ellipse cx="82" cy="28" rx="10" ry="18" fill="#fff" stroke="#1a1a1a" stroke-width="2.5"/>
+            <!-- Head -->
+            <ellipse cx="60" cy="55" rx="40" ry="38" fill="#fff" stroke="#1a1a1a" stroke-width="2.5"/>
+            <!-- Bow -->
+            <g transform="translate(80, 18)">
+              <path d="M 0 0 L 14 -7 L 14 7 Z" fill="#ff1744" stroke="#b71c1c" stroke-width="1.2"/>
+              <path d="M 0 0 L -14 -7 L -14 7 Z" fill="#ff1744" stroke="#b71c1c" stroke-width="1.2"/>
+              <circle cx="0" cy="0" r="3.5" fill="#ff1744" stroke="#b71c1c" stroke-width="1.2"/>
+              <circle cx="-6" cy="-2" r="1.5" fill="#ff8a80" opacity="0.7"/>
+            </g>
+            <!-- Eyes -->
+            <ellipse cx="46" cy="55" rx="3" ry="5" fill="#1a1a1a"/>
+            <ellipse cx="74" cy="55" rx="3" ry="5" fill="#1a1a1a"/>
+            <circle cx="47" cy="53" r="1" fill="#fff"/>
+            <circle cx="75" cy="53" r="1" fill="#fff"/>
+            <!-- Nose -->
+            <ellipse cx="60" cy="66" rx="3.5" ry="2.5" fill="#ffc107" stroke="#1a1a1a" stroke-width="0.8"/>
+            <!-- Mouth -->
+            <path d="M 55 73 Q 60 78 65 73" stroke="#1a1a1a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- Whiskers -->
+            <line x1="18" y1="62" x2="40" y2="64" stroke="#1a1a1a" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="18" y1="70" x2="40" y2="70" stroke="#1a1a1a" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="80" y1="64" x2="102" y2="62" stroke="#1a1a1a" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="80" y1="70" x2="102" y2="70" stroke="#1a1a1a" stroke-width="1.4" stroke-linecap="round"/>
+            <!-- Body (white shirt) -->
+            <path d="M 32 100 Q 32 96 36 96 L 84 96 Q 88 96 88 100 L 88 138 L 32 138 Z" fill="#fff" stroke="#1a1a1a" stroke-width="2.5"/>
+            <!-- Pink overall straps -->
+            <path d="M 42 96 L 42 116 L 50 116 L 50 96 Z" fill="#ff4081" stroke="#1a1a1a" stroke-width="1.5"/>
+            <path d="M 70 96 L 70 116 L 78 116 L 78 96 Z" fill="#ff4081" stroke="#1a1a1a" stroke-width="1.5"/>
+            <!-- Pink overall bottom -->
+            <path d="M 34 116 L 86 116 L 84 138 L 36 138 Z" fill="#ff4081" stroke="#1a1a1a" stroke-width="2"/>
+            <!-- Buttons -->
+            <circle cx="50" cy="128" r="2" fill="#ffc107" stroke="#1a1a1a" stroke-width="0.8"/>
+            <circle cx="70" cy="128" r="2" fill="#ffc107" stroke="#1a1a1a" stroke-width="0.8"/>
+          </svg>
+        </div>
+        <div class="bubble" id="bubble">
+          <span class="close" onclick="hideBubble()">×</span>
+          <span id="bubble-text">Hello!</span>
+        </div>
+        <div class="portal" id="portal" style="display:none;">
+          <div class="portal-text">Go! ✨</div>
+        </div>
+        <div class="ground"></div>
+      </div>
+    </div>
+    <div id="touch-controls">
+      <div class="ctrl-group">
+        <button class="ctrl-btn" data-key="ArrowLeft">◀</button>
+        <button class="ctrl-btn" data-key="ArrowRight">▶</button>
+      </div>
+      <div class="ctrl-group">
+        <button class="ctrl-btn" data-key="Space">⤴</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEVEL COMPLETE ============ -->
+  <div id="level-complete" class="screen hidden">
+    <div class="lc-card">
+      <div class="lc-emoji" id="lc-emoji">💖</div>
+      <h2 class="lc-title" id="lc-title">Level Complete!</h2>
+      <p class="lc-msg" id="lc-msg">You did it!</p>
+      <button class="lc-btn" id="next-level-btn">Next Level ▶</button>
+    </div>
+  </div>
+
+  <!-- ============ GAME COMPLETE ============ -->
+  <div id="game-complete" class="screen hidden">
+    <div class="gc-content">
+      <div class="gc-line1">GAME COMPLETE</div>
+      <div class="gc-line2">BUT OUR STORY ISN'T</div>
+      <p class="gc-msg">You collected every heart. You beat every level.</p>
+      <p class="gc-msg">But this story… is only just getting started.</p>
+      <div class="secret-heart" id="secret-heart" title="click me">💖</div>
+      <p class="secret-hint">(psst… click the heart)</p>
+    </div>
+  </div>
+
+  <!-- ============ FINAL REVEAL PAGE ============ -->
+  <!-- ✏️  CUSTOMIZE THE LOVE LETTER BELOW! Edit the <p> tags inside #final-letter -->
+  <div id="final-page" class="screen hidden">
+    <div class="final-content">
+      <div class="final-hello">Hana 💕</div>
+      <div class="final-emoji-row">🌸✨💖✨🌸</div>
+      <div class="final-letter" id="final-letter">
+        <p>Hey Hana 💕</p>
+        <p>You just finished a tiny game I made for you, but honestly, the real game is the one we've been playing together since the day we met.</p>
+        <p>Every level had a piece of us — the moment everything started, the memories we keep collecting, the silly things only we laugh at, and all the little things about you I fall in love with over and over.</p>
+        <p>But the real final level? <strong>It's the one we write together.</strong> And I really, really want to play it with you — for a long, long time.</p>
+        <p>No respawns, no game over, just us.</p>
+        <p>Thank you for being my favourite person, Hana. Now and always. 💕</p>
+      </div>
+      <div class="final-sign" id="final-sign">— Yours, always ✨</div>
+      <div class="final-forever">Forever &amp; always 💖</div>
+      <div class="final-actions">
+        <button class="gallery-btn" id="open-gallery-btn">📸 See our moments</button>
+        <button class="replay-btn" id="replay-btn">↻ Play again from the start</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PHOTO GALLERY ============ -->
+  <!-- 🖼️  Photos are loaded from the /photos folder — drop your images in there -->
+  <div id="photo-gallery" class="screen hidden gallery-screen">
+    <div class="gallery-wrap">
+      <div class="gallery-head">
+        <div class="gallery-title">Our Moments 📸</div>
+        <div class="gallery-sub" id="gallery-sub">Every photo here is a moment I'd happily relive a hundred times 💕</div>
+      </div>
+      <div class="gallery-grid" id="gallery-grid">
+        <!-- photos are injected here by JS -->
+      </div>
+      <button class="gallery-back" id="gallery-back-btn">← Back</button>
+    </div>
+  </div>
+
+  <!-- ============ LIGHTBOX ============ -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close">×</button>
+    <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous photo">‹</button>
+    <figure class="lightbox-figure">
+      <img id="lightbox-img" src="" alt="">
+      <figcaption id="lightbox-caption"></figcaption>
+    </figure>
+    <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next photo">›</button>
+  </div>
+
+<!-- 🖼️  YOUR PHOTOS: drop your images into the /photos folder next to this file.
+     Name them 1.jpg, 2.jpg, 3.jpg … and they appear automatically.
+     Want captions or a custom order? Edit photos.js. -->
+<script src="photos.js"></script>
+
+<script>
+/* ============================================================
+   OUR LOVE STORY — Game Logic
+   ============================================================ */
+
+// ============ LEVEL CONFIG ============
+// Each level: name, theme colors, decorations, items, message
+// Items: positions are in world coordinates (x from 300 to 2700)
+// ✏️  CUSTOMIZE THE MESSAGES BELOW to make it personal!
+//   - "msg"           : shown on the level-complete card
+//   - "bubbles[].msg" : the cute things the character says walking through
+//   - The final-page love letter is in the HTML above (search for #final-letter)
+//   - Change character colors by editing the <svg> in #character (search for "hk-svg")
+
+const LEVELS = [
+  {
+    name: "Level 1 — How We Met 💫",
+    sky: "linear-gradient(180deg, #ffd1e8 0%, #ffeef7 60%, #fff0d6 100%)",
+    groundTop: "#8bc34a",
+    emoji: "☕",
+    title: "Level 1 Complete!",
+    msg: "This is where it all started — the moment I met you, Hana, and my whole world turned into a pinker, sweeter place. ✨",
+    decorations: [
+      { type: "cloud", x: 200, y: 80, scale: 1 },
+      { type: "cloud", x: 600, y: 120, scale: 0.7 },
+      { type: "cloud", x: 1100, y: 60, scale: 1.2 },
+      { type: "cloud", x: 1700, y: 100, scale: 0.9 },
+      { type: "cloud", x: 2200, y: 80, scale: 1 },
+      { type: "heart-balloon", x: 400, y: 180 },
+      { type: "heart-balloon", x: 1400, y: 200 },
+      { type: "heart-balloon", x: 2300, y: 160 },
+      { type: "tree", x: 300, y: -8 },
+      { type: "tree", x: 900, y: -8 },
+      { type: "tree", x: 1500, y: -8 },
+      { type: "tree", x: 2100, y: -8 },
+      { type: "flower", x: 500, color: "#ff80ab" },
+      { type: "flower", x: 800, color: "#ffd700" },
+      { type: "flower", x: 1200, color: "#ff80ab" },
+      { type: "flower", x: 1800, color: "#ba68c8" },
+      { type: "flower", x: 2400, color: "#ffd700" },
+    ],
+    bubbles: [
+      { x: 250, msg: "Hi, I'm new here… 👋" },
+      { x: 900, msg: "Wait… who's that? 👀" },
+      { x: 1600, msg: "Oh no… I think I'm falling 💕" },
+    ],
+    items: [
+      { x: 380, type: "heart" }, { x: 620, type: "star" },
+      { x: 870, type: "heart" }, { x: 1150, type: "star" },
+      { x: 1400, type: "heart" }, { x: 1700, type: "star" },
+      { x: 1980, type: "heart" }, { x: 2280, type: "star" },
+      { x: 2550, type: "heart" },
+    ],
+    portalX: 2750
+  },
+  {
+    name: "Level 2 — Our Memories 💞",
+    sky: "linear-gradient(180deg, #ffb088 0%, #ff80ab 40%, #ba68c8 100%)",
+    groundTop: "#7cb342",
+    emoji: "📸",
+    title: "Level 2 Complete!",
+    msg: "Every memory with you is my favourite, Hana. The big trips, the tiny moments, even the ordinary days feel special with you. 💞",
+    decorations: [
+      { type: "cloud", x: 250, y: 90, scale: 0.8, color: "rgba(255,255,255,0.6)" },
+      { type: "cloud", x: 800, y: 130, scale: 1 },
+      { type: "cloud", x: 1500, y: 80, scale: 0.9 },
+      { type: "cloud", x: 2100, y: 110, scale: 1.1 },
+      { type: "sun", x: 2400, y: 100 },
+      { type: "tree", x: 250, y: -8 },
+      { type: "tree", x: 700, y: -8 },
+      { type: "tree", x: 1300, y: -8 },
+      { type: "tree", x: 1900, y: -8 },
+      { type: "tree", x: 2400, y: -8 },
+      { type: "flower", x: 450, color: "#fff" },
+      { type: "flower", x: 1000, color: "#ffeb3b" },
+      { type: "flower", x: 1700, color: "#fff" },
+      { type: "flower", x: 2200, color: "#ff80ab" },
+      { type: "photo-frame", x: 500, y: 280, photoIdx: 0 },
+      { type: "photo-frame", x: 1100, y: 280, photoIdx: 1 },
+      { type: "photo-frame", x: 1700, y: 280, photoIdx: 2 },
+      { type: "photo-frame", x: 2300, y: 280, photoIdx: 3 },
+    ],
+    bubbles: [
+      { x: 300, msg: "Remember this day? 💕" },
+      { x: 1100, msg: "Best. Day. Ever. ✨" },
+      { x: 1900, msg: "I want a million more 🥰" },
+    ],
+    items: [
+      { x: 350, type: "heart" }, { x: 600, type: "star" },
+      { x: 880, type: "heart" }, { x: 1180, type: "star" },
+      { x: 1450, type: "heart" }, { x: 1750, type: "star" },
+      { x: 2020, type: "heart" }, { x: 2300, type: "star" },
+      { x: 2580, type: "heart" },
+    ],
+    portalX: 2750
+  },
+  {
+    name: "Level 3 — The Funny Stuff 😂",
+    sky: "linear-gradient(180deg, #fff59d 0%, #ffcc80 50%, #ffab91 100%)",
+    groundTop: "#9ccc65",
+    emoji: "🤣",
+    title: "Level 3 Complete!",
+    msg: "You make me laugh like nobody else can, Hana. The inside jokes, the silly moments, the way you snort when you laugh — I love all of it. 😂💕",
+    decorations: [
+      { type: "cloud", x: 300, y: 90, scale: 1, color: "rgba(255,255,255,0.7)" },
+      { type: "cloud", x: 900, y: 130, scale: 0.8, color: "rgba(255,255,255,0.7)" },
+      { type: "cloud", x: 1600, y: 100, scale: 1, color: "rgba(255,255,255,0.7)" },
+      { type: "cloud", x: 2200, y: 80, scale: 0.9, color: "rgba(255,255,255,0.7)" },
+      { type: "tree", x: 300, y: -8 },
+      { type: "tree", x: 850, y: -8 },
+      { type: "tree", x: 1400, y: -8 },
+      { type: "tree", x: 2000, y: -8 },
+      { type: "flower", x: 500, color: "#ff5252" },
+      { type: "flower", x: 1100, color: "#ffd54f" },
+      { type: "flower", x: 1700, color: "#ff5252" },
+      { type: "flower", x: 2300, color: "#ffd54f" },
+      { type: "emoji-float", x: 600, y: 240, emoji: "😂" },
+      { type: "emoji-float", x: 1100, y: 280, emoji: "🤣" },
+      { type: "emoji-float", x: 1700, y: 240, emoji: "🤪" },
+      { type: "emoji-float", x: 2200, y: 280, emoji: "😜" },
+    ],
+    bubbles: [
+      { x: 280, msg: "BAHAHAHA 🤪" },
+      { x: 1000, msg: "Stop! You're too funny 😂" },
+      { x: 1900, msg: "My stomach HURTS 🤣" },
+    ],
+    items: [
+      { x: 370, type: "star" }, { x: 640, type: "heart" },
+      { x: 920, type: "star" }, { x: 1200, type: "heart" },
+      { x: 1480, type: "star" }, { x: 1780, type: "heart" },
+      { x: 2050, type: "star" }, { x: 2330, type: "heart" },
+      { x: 2580, type: "star" },
+    ],
+    portalX: 2750
+  },
+  {
+    name: "Level 4 — Things I Love About You 💗",
+    sky: "linear-gradient(180deg, #ffcdd2 0%, #f8bbd0 50%, #ce93d8 100%)",
+    groundTop: "#aed581",
+    emoji: "💝",
+    title: "Level 4 Complete!",
+    msg: "Hana, your smile, your kindness, the way you care — there are a million things I love about you, and I'm still counting. 💗",
+    decorations: [
+      { type: "cloud", x: 200, y: 80, scale: 1, color: "rgba(255,255,255,0.7)" },
+      { type: "cloud", x: 800, y: 110, scale: 0.9, color: "rgba(255,255,255,0.7)" },
+      { type: "cloud", x: 1500, y: 80, scale: 1, color: "rgba(255,255,255,0.7)" },
+      { type: "cloud", x: 2200, y: 110, scale: 0.8, color: "rgba(255,255,255,0.7)" },
+      { type: "tree", x: 250, y: -8 },
+      { type: "tree", x: 750, y: -8 },
+      { type: "tree", x: 1250, y: -8 },
+      { type: "tree", x: 1750, y: -8 },
+      { type: "tree", x: 2300, y: -8 },
+      { type: "rose", x: 450 },
+      { type: "rose", x: 900 },
+      { type: "rose", x: 1350 },
+      { type: "rose", x: 1800 },
+      { type: "rose", x: 2250 },
+      { type: "emoji-float", x: 600, y: 260, emoji: "💖" },
+      { type: "emoji-float", x: 1200, y: 240, emoji: "✨" },
+      { type: "emoji-float", x: 1800, y: 260, emoji: "💕" },
+      { type: "emoji-float", x: 2400, y: 240, emoji: "🌹" },
+    ],
+    bubbles: [
+      { x: 280, msg: "I love your smile 😊" },
+      { x: 1000, msg: "I love your laugh 💖" },
+      { x: 1800, msg: "I love YOU ✨" },
+    ],
+    items: [
+      { x: 380, type: "heart" }, { x: 650, type: "star" },
+      { x: 920, type: "heart" }, { x: 1200, type: "star" },
+      { x: 1480, type: "heart" }, { x: 1750, type: "star" },
+      { x: 2030, type: "heart" }, { x: 2300, type: "star" },
+      { x: 2580, type: "heart" },
+    ],
+    portalX: 2750
+  },
+  {
+    name: "Final Level — ??? 🌙",
+    sky: "linear-gradient(180deg, #0d0033 0%, #1a0d4e 50%, #4a1942 100%)",
+    groundTop: "#5e35b1",
+    emoji: "🌟",
+    title: "Final Level Complete!",
+    msg: "The final level, Hana… is the one we get to live together. ✨",
+    decorations: [
+      { type: "star", x: 200, y: 100, size: 3 },
+      { type: "star", x: 500, y: 70, size: 2 },
+      { type: "star", x: 800, y: 130, size: 4 },
+      { type: "star", x: 1100, y: 90, size: 2 },
+      { type: "star", x: 1400, y: 110, size: 3 },
+      { type: "star", x: 1700, y: 70, size: 2 },
+      { type: "star", x: 2000, y: 130, size: 4 },
+      { type: "star", x: 2300, y: 90, size: 3 },
+      { type: "moon", x: 2500, y: 120 },
+      { type: "tree", x: 300, y: -8 },
+      { type: "tree", x: 900, y: -8 },
+      { type: "tree", x: 1500, y: -8 },
+      { type: "tree", x: 2100, y: -8 },
+      { type: "emoji-float", x: 600, y: 240, emoji: "💫" },
+      { type: "emoji-float", x: 1200, y: 260, emoji: "🌟" },
+      { type: "emoji-float", x: 1900, y: 240, emoji: "✨" },
+      { type: "emoji-float", x: 2400, y: 280, emoji: "💖" },
+    ],
+    bubbles: [
+      { x: 300, msg: "Where are we going? 🌙" },
+      { x: 1100, msg: "It's so beautiful here… ✨" },
+      { x: 1900, msg: "I never want this to end 💕" },
+    ],
+    items: [
+      { x: 380, type: "star" }, { x: 650, type: "heart" },
+      { x: 920, type: "star" }, { x: 1200, type: "heart" },
+      { x: 1480, type: "star" }, { x: 1750, type: "heart" },
+      { x: 2030, type: "star" }, { x: 2300, type: "heart" },
+      { x: 2580, type: "star" },
+    ],
+    portalX: 2750
+  }
+];
+
+// ============ GAME STATE ============
+const WORLD_WIDTH = 3000;
+const GROUND_HEIGHT = 90;
+const CHAR_WIDTH = 90;
+const CHAR_HEIGHT = 110;
+
+let state = {
+  level: 0,
+  collected: 0,
+  total: 0,
+  pos: { x: 80, y: 0 },       // character world position (y is height above ground)
+  vel: { x: 0, y: 0 },
+  facing: 1,                    // 1 right, -1 left
+  onGround: true,
+  walking: false,
+  keys: {},
+  showBubbleAt: null,           // index in level.bubbles of currently shown bubble
+  finished: false
+};
+
+// ============ DOM REFS ============
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+const startScreen = $('#start-screen');
+const gameScreen = $('#game-screen');
+const levelCompleteScreen = $('#level-complete');
+const gameCompleteScreen = $('#game-complete');
+const finalPageScreen = $('#final-page');
+
+const levelNameEl = $('#level-name');
+const heartsCounterEl = $('#hearts-counter');
+const camera = $('#camera');
+const skyEl = $('#sky');
+const decoLayer = $('#decorations');
+const itemsLayer = $('#items-layer');
+const character = $('#character');
+const bubble = $('#bubble');
+const bubbleText = $('#bubble-text');
+const portal = $('#portal');
+
+const galleryScreen = $('#photo-gallery');
+const galleryGrid = $('#gallery-grid');
+const gallerySub = $('#gallery-sub');
+const lightbox = $('#lightbox');
+const lightboxImg = $('#lightbox-img');
+const lightboxCaption = $('#lightbox-caption');
+
+/* ============================================================
+   PHOTOS
+   ------------------------------------------------------------
+   Photos live in the /photos folder next to index.html:
+       photos/1.jpg
+       photos/2.jpg
+       ...
+   Two ways to use them:
+     1. photos.js  -> window.PHOTOS = [{ src, caption }, ...]   (exact control)
+     2. auto-scan  -> files named 1.jpg / 1.png / 01.jpg ... are picked up
+                       automatically, no editing needed.
+   Everything uses RELATIVE paths, so the site works on GitHub Pages
+   whether it is served from a root domain or from /repo-name/.
+   ============================================================ */
+
+const PHOTO_SETTINGS = Object.assign({
+  folder: 'photos/',          // folder inside the repo (relative to index.html)
+  autoScan: true,             // auto-detect numbered files
+  scanStart: 1,               // first index to probe
+  scanEnd: 24,                // last index to probe
+  scanExtensions: ['jpg', 'jpeg', 'png', 'webp'],  // tried in order
+  scanZeroPad: [false, true], // probe "1.jpg" and also "01.jpg"
+  scanMissTolerance: 3,       // stop after this many empty slots in a row
+  galleryTitle: 'Our Moments 📸',
+  gallerySubtitle: "Every photo here is a moment I'd happily relive a hundred times 💕"
+}, window.PHOTO_SETTINGS || {});
+
+let photoCache = null;   // merged list, resolved once
+let photoScanDone = false;
+let galleryReturnScreen = null;
+let lightboxIndex = 0;
+
+/** Does this URL exist? Resolves to true/false without touching the DOM. */
+function urlExists(src) {
+  return new Promise(resolve => {
+    const probe = new Image();
+    probe.onload = () => resolve(true);
+    probe.onerror = () => resolve(false);
+    probe.src = src;
+  });
+}
+
+/**
+ * Find the photo for one index.
+ * Extensions are tried one at a time ("1.jpg", "01.jpg", "1.jpeg", …) so a
+ * folder of .jpg photos only costs ONE request per photo.
+ */
+async function probeIndex(num) {
+  for (const ext of PHOTO_SETTINGS.scanExtensions) {
+    for (const pad of PHOTO_SETTINGS.scanZeroPad) {
+      const label = pad ? String(num).padStart(2, '0') : String(num);
+      const src = `${PHOTO_SETTINGS.folder}${label}.${ext}`;
+      if (await urlExists(src)) return src;
+    }
+  }
+  return null;
+}
+
+/**
+ * Walk photos/1.*, photos/2.* ... and collect the ones that exist.
+ * Stops after `scanMissTolerance` empty slots in a row, so we never
+ * hammer the server with requests for photos that aren't there.
+ */
+async function scanPhotoFolder() {
+  const found = [];
+  let misses = 0;
+  const tolerance = Math.max(1, PHOTO_SETTINGS.scanMissTolerance);
+
+  for (let i = PHOTO_SETTINGS.scanStart; i <= PHOTO_SETTINGS.scanEnd; i++) {
+    const src = await probeIndex(i);
+    if (src) { found.push(src); misses = 0; }
+    else { misses++; if (misses >= tolerance) break; }
+  }
+  return found;
+}
+
+/** Merge the explicit photos.js list with the auto-scanned numbered files. */
+function resolvePhotos() {
+  if (photoCache) return photoCache;
+
+  const explicit = (Array.isArray(window.PHOTOS) ? window.PHOTOS : [])
+    .filter(p => p && p.src)
+    .map(p => ({ src: p.src, caption: p.caption || '' }));
+
+  if (!PHOTO_SETTINGS.autoScan) {
+    photoCache = explicit;
+    photoScanDone = true;
+    return photoCache;
+  }
+
+  photoCache = explicit;   // show the explicit list straight away
+
+  // Probe photos/1.jpg, photos/1.png, ... in the background and merge in
+  // whatever actually exists. Runs once per page load.
+  scanPhotoFolder().then(found => {
+    const seen = new Set(explicit.map(p => p.src.replace(/^\.?\//, '')));
+    const auto = [];
+    found.forEach((src) => {
+      if (!seen.has(src)) { seen.add(src); auto.push({ src, caption: '' }); }
+    });
+
+    photoCache = explicit.concat(auto);
+    photoScanDone = true;
+    if (galleryScreen && !galleryScreen.classList.contains('hidden')) {
+      renderGallery();
+    }
+    // If the player is already in a level with polaroid frames, refresh them
+    // so they pick up the photos that were just found.
+    if (!gameScreen.classList.contains('hidden')) {
+      const level = LEVELS[state.level];
+      if (level && level.decorations.some(d => d.type === 'photo-frame')) {
+        decoLayer.innerHTML = '';
+        level.decorations.forEach(d => decoLayer.appendChild(makeDecoration(d)));
+      }
+    }
+  });
+
+  return photoCache;
+}
+
+/** Build the polaroid grid for the gallery screen. */
+function renderGallery() {
+  if (!galleryGrid) return;
+  const photos = resolvePhotos();
+  galleryGrid.innerHTML = '';
+
+  if (!photos.length) {
+    // Still scanning? Show a gentle loader instead of "no photos" straight away.
+    if (!photoScanDone && PHOTO_SETTINGS.autoScan) {
+      galleryGrid.innerHTML = `
+        <div class="gallery-empty">
+          <div class="gallery-empty-icon">📷</div>
+          <div class="gallery-empty-title">Looking for photos…</div>
+          <div class="gallery-empty-text" style="text-align:center;">
+            <p>Checking the <code>photos/</code> folder…</p>
+          </div>
+        </div>`;
+      return;
+    }
+    galleryGrid.innerHTML = `
+      <div class="gallery-empty">
+        <div class="gallery-empty-icon">📷</div>
+        <div class="gallery-empty-title">No photos yet</div>
+        <div class="gallery-empty-text">
+          <p>Add your pictures to the <code>photos/</code> folder in this repo, then name them
+          <code>1.jpg</code>, <code>2.jpg</code>, <code>3.jpg</code> …</p>
+          <p style="margin-top:10px">They will show up here automatically. For any other file name —
+          or to add captions and a custom order — list them in <code>photos.js</code>.</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  photos.forEach((p, i) => {
+    const fig = document.createElement('figure');
+    fig.className = 'polaroid';
+    fig.setAttribute('role', 'button');
+    fig.setAttribute('tabindex', '0');
+    fig.innerHTML = `
+      <div class="polaroid-img">
+        <img src="${p.src}" alt="${p.caption || 'Our photo ' + (i + 1)}" loading="lazy"
+             onerror="this.parentNode.innerHTML='💕'">
+      </div>
+      ${p.caption ? `<figcaption>${p.caption}</figcaption>` : ''}`;
+    fig.addEventListener('click', () => openLightbox(i));
+    fig.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(i); }
+    });
+    galleryGrid.appendChild(fig);
+  });
+}
+
+/* ---------- Lightbox ---------- */
+function openLightbox(index) {
+  const photos = resolvePhotos();
+  if (!photos.length) return;
+  lightboxIndex = (index + photos.length) % photos.length;
+  const p = photos[lightboxIndex];
+  lightboxImg.src = p.src;
+  lightboxImg.alt = p.caption || 'Our photo';
+  lightboxCaption.textContent = p.caption || '';
+  lightbox.classList.add('open');
+  lightbox.setAttribute('aria-hidden', 'false');
+}
+function closeLightbox() {
+  lightbox.classList.remove('open');
+  lightbox.setAttribute('aria-hidden', 'true');
+}
+function stepLightbox(dir) {
+  const photos = resolvePhotos();
+  if (!photos.length) return;
+  openLightbox((lightboxIndex + dir + photos.length) % photos.length);
+}
+
+/* ---------- Gallery screen ---------- */
+function openGallery(returnTo) {
+  galleryReturnScreen = returnTo || finalPageScreen;
+  if (PHOTO_SETTINGS.galleryTitle) {
+    const t = document.querySelector('.gallery-title');
+    if (t) t.textContent = PHOTO_SETTINGS.galleryTitle;
+  }
+  if (PHOTO_SETTINGS.gallerySubtitle && gallerySub) {
+    gallerySub.textContent = PHOTO_SETTINGS.gallerySubtitle;
+  }
+  renderGallery();
+  showScreen(galleryScreen);
+}
+function closeGallery() {
+  showScreen(galleryReturnScreen || finalPageScreen);
+}
+
+// ============ SCREEN MANAGEMENT ============
+function showScreen(el) {
+  $$('.screen').forEach(s => s.classList.add('hidden'));
+  el.classList.remove('hidden');
+}
+
+// ============ LEVEL LOADING ============
+function loadLevel(idx) {
+  const level = LEVELS[idx];
+  state.level = idx;
+  state.collected = 0;
+  state.total = level.items.length;
+  state.pos = { x: 80, y: 0 };
+  state.vel = { x: 0, y: 0 };
+  state.facing = 1;
+  state.onGround = true;
+  state.walking = false;
+  state.showBubbleAt = null;
+  state.finished = false;
+
+  // HUD
+  levelNameEl.textContent = level.name;
+  heartsCounterEl.textContent = `💕 ${state.collected} / ${state.total}`;
+
+  // Sky
+  skyEl.style.background = level.sky;
+
+  // Decorations
+  decoLayer.innerHTML = '';
+  level.decorations.forEach(d => decoLayer.appendChild(makeDecoration(d)));
+
+  // Items
+  itemsLayer.innerHTML = '';
+  level.items.forEach((it, i) => {
+    const el = makeItem(it, i);
+    itemsLayer.appendChild(el);
+  });
+
+  // Portal
+  portal.style.display = 'flex';
+  portal.style.left = level.portalX + 'px';
+  portal.querySelector('.portal-text').textContent = idx === LEVELS.length - 1 ? 'Finish! 💖' : 'Next! ✨';
+
+  // Character
+  character.classList.remove('facing-left', 'walking');
+  character.style.transform = 'translate(0, 0)';
+
+  // Camera
+  updateCamera();
+
+  // Brief intro bubble
+  setTimeout(() => {
+    const intro = idx === 0
+      ? "Use ← → to move, Space to jump. Collect all the hearts! 💕"
+      : idx === LEVELS.length - 1
+        ? "Final level. The mystery awaits… ✨"
+        : "Collect every heart, then reach the portal! 💖";
+    showBubbleAt(120, intro);
+  }, 400);
+}
+
+function makeDecoration(d) {
+  const el = document.createElement('div');
+  el.className = 'deco ' + d.type;
+  el.style.left = d.x + 'px';
+  if (d.y !== undefined) el.style.top = d.y + 'px';
+  if (d.bottom !== undefined) el.style.bottom = d.bottom + 'px';
+
+  switch (d.type) {
+    case 'cloud': {
+      el.style.top = d.y + 'px';
+      el.innerHTML = `<svg width="${100 * (d.scale||1)}" height="${40 * (d.scale||1)}" viewBox="0 0 100 40">
+        <ellipse cx="30" cy="25" rx="20" ry="15" fill="${d.color || 'rgba(255,255,255,0.9)'}"/>
+        <ellipse cx="55" cy="20" rx="25" ry="18" fill="${d.color || 'rgba(255,255,255,0.9)'}"/>
+        <ellipse cx="78" cy="25" rx="18" ry="14" fill="${d.color || 'rgba(255,255,255,0.9)'}"/>
+      </svg>`;
+      el.style.animation = `float ${4 + Math.random()*2}s ease-in-out infinite`;
+      break;
+    }
+    case 'sun': {
+      el.innerHTML = `<div style="width:80px;height:80px;background:radial-gradient(circle,#fff59d,#ffb300);border-radius:50%;box-shadow:0 0 60px #ffeb3b;"></div>`;
+      break;
+    }
+    case 'moon': {
+      el.innerHTML = `<div style="width:70px;height:70px;background:radial-gradient(circle at 35% 35%,#fff,#fdd);border-radius:50%;box-shadow:0 0 50px rgba(255,255,255,0.5);"></div>`;
+      break;
+    }
+    case 'star': {
+      const s = d.size || 2;
+      el.innerHTML = `<div style="position:absolute;width:${s*2}px;height:${s*2}px;background:white;border-radius:50%;box-shadow:0 0 ${s*4}px white;"></div>`;
+      el.style.animation = `twinkle ${1 + Math.random()*2}s ease-in-out infinite`;
+      break;
+    }
+    case 'tree': {
+      el.style.bottom = (GROUND_HEIGHT - 8) + 'px';
+      el.innerHTML = `<svg width="80" height="120" viewBox="0 0 80 120">
+        <rect x="34" y="70" width="12" height="50" fill="#6d4c41"/>
+        <circle cx="40" cy="55" r="32" fill="#388e3c"/>
+        <circle cx="22" cy="65" r="22" fill="#43a047"/>
+        <circle cx="58" cy="65" r="22" fill="#43a047"/>
+        <circle cx="40" cy="35" r="25" fill="#66bb6a"/>
+      </svg>`;
+      break;
+    }
+    case 'flower': {
+      el.style.bottom = (GROUND_HEIGHT - 2) + 'px';
+      el.innerHTML = `<svg width="30" height="40" viewBox="0 0 30 40">
+        <line x1="15" y1="20" x2="15" y2="40" stroke="#2e7d32" stroke-width="2"/>
+        <circle cx="6" cy="10" r="5" fill="${d.color}"/>
+        <circle cx="24" cy="10" r="5" fill="${d.color}"/>
+        <circle cx="15" cy="4" r="5" fill="${d.color}"/>
+        <circle cx="10" cy="18" r="5" fill="${d.color}"/>
+        <circle cx="20" cy="18" r="5" fill="${d.color}"/>
+        <circle cx="15" cy="13" r="3" fill="#ffeb3b"/>
+      </svg>`;
+      break;
+    }
+    case 'rose': {
+      el.style.bottom = (GROUND_HEIGHT - 2) + 'px';
+      el.innerHTML = `<svg width="40" height="60" viewBox="0 0 40 60">
+        <line x1="20" y1="20" x2="20" y2="60" stroke="#2e7d32" stroke-width="2.5"/>
+        <ellipse cx="14" cy="40" rx="6" ry="3" fill="#2e7d32" transform="rotate(-30 14 40)"/>
+        <ellipse cx="26" cy="35" rx="6" ry="3" fill="#2e7d32" transform="rotate(30 26 35)"/>
+        <circle cx="20" cy="14" r="9" fill="#c2185b"/>
+        <circle cx="20" cy="14" r="5" fill="#e91e63"/>
+        <circle cx="20" cy="14" r="2" fill="#ff80ab"/>
+      </svg>`;
+      break;
+    }
+    case 'heart-balloon': {
+      el.innerHTML = `<svg width="50" height="70" viewBox="0 0 50 70">
+        <path d="M 25 30 C 5 10, 5 -5, 20 0 C 25 -2, 25 -2, 30 0 C 45 -5, 45 10, 25 30 Z" fill="#ff4081" stroke="#c2185b" stroke-width="1.5"/>
+        <line x1="25" y1="30" x2="25" y2="65" stroke="#5d4037" stroke-width="1"/>
+      </svg>`;
+      el.style.animation = `float ${3 + Math.random()}s ease-in-out infinite`;
+      break;
+    }
+    case 'photo-frame': {
+      // Use a real image from the /photos folder if available, else fall back to emoji
+      const photos = resolvePhotos();
+      const photoData = photos[d.photoIdx !== undefined ? d.photoIdx : 0] || { src: null, caption: d.emoji || '💕' };
+      const rotation = -6 + Math.random() * 12;
+      // Only show caption as overlay if there IS a photo
+      const hasPhoto = !!photoData.src;
+      const inner = hasPhoto
+        ? `<img src="${photoData.src}" alt="us" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.outerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:42px;background:linear-gradient(135deg,#ffeef7,#fff0f7);\\'>${d.emoji || '💕'}</div>'"/>`
+        : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:46px;background:linear-gradient(135deg,#ffeef7,#fff0f7);">${d.emoji || '💕'}</div>`;
+      // Caption strip below the polaroid — only when there's a real photo
+      const caption = hasPhoto && photoData.caption
+        ? `<div style="margin-top:6px;text-align:center;font-family:'Pacifico',cursive;font-size:12px;color:#c2185b;line-height:1.1;max-width:94px;overflow:hidden;text-overflow:ellipsis;">${photoData.caption}</div>`
+        : '';
+      el.innerHTML = `<div style="width:110px;background:white;padding:8px 8px 6px;box-shadow:0 8px 24px rgba(0,0,0,0.25);border-radius:4px;transform:rotate(${rotation}deg);">
+        <div style="width:94px;height:94px;overflow:hidden;border-radius:2px;">${inner}</div>
+        ${caption}
+      </div>`;
+      break;
+    }
+    case 'emoji-float': {
+      el.innerHTML = `<div style="font-size:42px;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.15));">${d.emoji}</div>`;
+      el.style.animation = `float ${2.5 + Math.random()}s ease-in-out infinite`;
+      break;
+    }
+  }
+  return el;
+}
+
+function makeItem(it, idx) {
+  const el = document.createElement('div');
+  el.className = 'item';
+  el.style.left = it.x + 'px';
+  el.style.animationDelay = `${idx * 0.15}s, ${idx * 0.1}s`;
+  if (it.type === 'star') {
+    el.innerHTML = '⭐';
+  } else {
+    el.innerHTML = '💖';
+  }
+  el.dataset.x = it.x;
+  el.dataset.idx = idx;
+  return el;
+}
+
+// ============ GAME LOOP ============
+let lastTime = 0;
+let gravity = 0.8;
+let moveSpeed = 4;
+let jumpVel = -14;
+
+function loop(time) {
+  const dt = Math.min(33, time - lastTime) / 16.67; // normalize to ~60fps units
+  lastTime = time;
+
+  if (!gameScreen.classList.contains('hidden') && !state.finished) {
+    update(dt);
+    render();
+  }
+
+  requestAnimationFrame(loop);
+}
+
+function update(dt) {
+  // Horizontal
+  const wantLeft = state.keys.ArrowLeft || state.keys.KeyA;
+  const wantRight = state.keys.ArrowRight || state.keys.KeyD;
+  const wantJump = state.keys.Space || state.keys.ArrowUp || state.keys.KeyW;
+
+  let targetVx = 0;
+  if (wantLeft) targetVx -= moveSpeed;
+  if (wantRight) targetVx += moveSpeed;
+
+  state.vel.x = targetVx;
+  state.pos.x += state.vel.x * dt;
+  state.pos.x = Math.max(0, Math.min(WORLD_WIDTH - CHAR_WIDTH, state.pos.x));
+
+  // Facing
+  if (targetVx < 0) state.facing = -1;
+  else if (targetVx > 0) state.facing = 1;
+  state.walking = targetVx !== 0;
+
+  // Gravity
+  state.vel.y += gravity * dt;
+  state.pos.y -= state.vel.y * dt; // y is height above ground
+  if (state.pos.y <= 0) {
+    state.pos.y = 0;
+    state.vel.y = 0;
+    state.onGround = true;
+  } else {
+    state.onGround = false;
+  }
+
+  // Jump
+  if (wantJump && state.onGround) {
+    state.vel.y = jumpVel;
+    state.onGround = false;
+  }
+
+  // Item collisions
+  checkItemCollisions();
+
+  // Bubbles
+  checkBubbleProximity();
+
+  // Portal / level complete
+  const level = LEVELS[state.level];
+  if (state.pos.x + CHAR_WIDTH >= level.portalX) {
+    if (state.collected >= state.total) {
+      levelComplete();
+    } else {
+      // Nudge back and show hint
+      state.pos.x = level.portalX - CHAR_WIDTH - 4;
+      state.vel.x = 0;
+      showBubbleAt(portal, "Collect all the hearts first! 💕");
+    }
+  }
+}
+
+// Show a bubble at any world X position (used for portal hint)
+function showBubbleAt(worldX, text) {
+  bubbleText.textContent = text;
+  bubble.style.left = (worldX - 60) + 'px';
+  bubble.classList.add('show');
+  clearTimeout(bubble._timer);
+  bubble._timer = setTimeout(() => bubble.classList.remove('show'), 1800);
+}
+
+function checkItemCollisions() {
+  // Coordinates in "from-camera-bottom" space
+  // Character: bottom at 90 (ground), top at 90 + CHAR_HEIGHT, raised by state.pos.y
+  // Item: bottom at 110, top at 110 + 36
+  const charYBottom = 90 + state.pos.y;
+  const charYTop = charYBottom + CHAR_HEIGHT;
+  const charXLeft = state.pos.x + 15;
+  const charXRight = state.pos.x + CHAR_WIDTH - 15;
+
+  const ITEM_Y_BOTTOM = 110;
+  const ITEM_Y_TOP = 110 + 36;
+
+  // Camera transform for burst positioning
+  const camMatch = (camera.style.transform || '').match(/-?\d+(\.\d+)?/);
+  const camX = camMatch ? parseFloat(camMatch[0]) : 0;
+
+  document.querySelectorAll('.item').forEach(el => {
+    if (el.classList.contains('collected')) return;
+    const ix = parseFloat(el.dataset.x);
+
+    if (charXRight > ix && charXLeft < ix + 36 &&
+        charYTop > ITEM_Y_BOTTOM && charYBottom < ITEM_Y_TOP) {
+      el.classList.add('collected');
+      state.collected++;
+      heartsCounterEl.textContent = `💕 ${state.collected} / ${state.total}`;
+      // Burst at character's apparent screen position
+      const burstX = state.pos.x + camX + CHAR_WIDTH / 2;
+      const burstY = window.innerHeight - charYTop - 20;
+      burst(burstX, burstY, el.textContent);
+    }
+  });
+}
+
+function checkBubbleProximity() {
+  const level = LEVELS[state.level];
+  if (!level.bubbles) return;
+  let found = -1;
+  for (let i = 0; i < level.bubbles.length; i++) {
+    const b = level.bubbles[i];
+    if (state.pos.x + CHAR_WIDTH/2 > b.x - 80 && state.pos.x + CHAR_WIDTH/2 < b.x + 200) {
+      found = i;
+      break;
+    }
+  }
+  if (found !== state.showBubbleAt) {
+    state.showBubbleAt = found;
+    if (found >= 0) {
+      bubbleText.textContent = level.bubbles[found].msg;
+      bubble.style.left = (level.bubbles[found].x - 30) + 'px';
+      bubble.classList.add('show');
+    } else {
+      bubble.classList.remove('show');
+    }
+  }
+}
+
+function render() {
+  // Character position (in world space)
+  const charScreenX = state.pos.x;
+  const charScreenY = state.pos.y;
+  character.style.transform = `translate(${charScreenX}px, -${charScreenY}px)`;
+  character.classList.toggle('facing-left', state.facing === -1);
+  character.classList.toggle('walking', state.walking && state.onGround);
+
+  // Camera
+  updateCamera();
+}
+
+function updateCamera() {
+  const vw = window.innerWidth;
+  const targetCamX = -state.pos.x + vw / 3;
+  const clampedCamX = Math.max(-(WORLD_WIDTH - vw), Math.min(0, targetCamX));
+  camera.style.transform = `translateX(${clampedCamX}px)`;
+}
+
+// ============ LEVEL COMPLETE ============
+function levelComplete() {
+  state.finished = true;
+  setTimeout(() => {
+    const isLast = state.level === LEVELS.length - 1;
+    if (isLast) {
+      showGameComplete();
+    } else {
+      showLevelComplete();
+    }
+  }, 500);
+}
+
+function showLevelComplete() {
+  const level = LEVELS[state.level];
+  $('#lc-emoji').textContent = level.emoji;
+  $('#lc-title').textContent = level.title;
+  $('#lc-msg').textContent = level.msg;
+  showScreen(levelCompleteScreen);
+  launchConfetti();
+}
+
+function showGameComplete() {
+  showScreen(gameCompleteScreen);
+  launchConfetti();
+  setTimeout(() => launchConfetti(), 800);
+  setTimeout(() => launchConfetti(), 1600);
+}
+
+// ============ REVEAL FINAL PAGE ============
+function unlockFinal() {
+  showScreen(finalPageScreen);
+  // floating hearts animation
+  for (let i = 0; i < 30; i++) {
+    setTimeout(() => spawnFloatingHeart(), i * 200);
+  }
+}
+
+function spawnFloatingHeart() {
+  const h = document.createElement('div');
+  h.className = 'floating-heart';
+  h.textContent = ['💖','💕','💗','💝','💘','✨','🌸'][Math.floor(Math.random()*7)];
+  h.style.left = Math.random() * 100 + 'vw';
+  h.style.top = '100vh';
+  h.style.fontSize = (16 + Math.random()*22) + 'px';
+  document.body.appendChild(h);
+  setTimeout(() => h.remove(), 4500);
+}
+
+// ============ BURST EFFECT ============
+function burst(x, y, char) {
+  const el = document.createElement('div');
+  el.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:36px;pointer-events:none;z-index:60;`;
+  el.textContent = char;
+  document.body.appendChild(el);
+  el.animate([
+    { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
+    { transform: 'translate(-50%,-150%) scale(1.8)', opacity: 0 }
+  ], { duration: 800, easing: 'ease-out' });
+  setTimeout(() => el.remove(), 800);
+}
+
+// ============ CONFETTI ============
+function launchConfetti() {
+  const colors = ['#ff4081', '#ff80ab', '#ffd700', '#ba68c8', '#4fc3f7', '#fff'];
+  for (let i = 0; i < 60; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDelay = Math.random() * 0.5 + 's';
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 3500);
+  }
+}
+
+// ============ EVENT HANDLERS ============
+function hideBubble() {
+  bubble.classList.remove('show');
+  state.showBubbleAt = -1;
+}
+
+$('#start-btn').addEventListener('click', () => {
+  loadLevel(0);
+  showScreen(gameScreen);
+});
+
+$('#next-level-btn').addEventListener('click', () => {
+  loadLevel(state.level + 1);
+  showScreen(gameScreen);
+});
+
+$('#secret-heart').addEventListener('click', unlockFinal);
+
+$('#replay-btn').addEventListener('click', () => {
+  loadLevel(0);
+  showScreen(gameScreen);
+});
+
+// ============ GALLERY + LIGHTBOX EVENTS ============
+$('#open-gallery-btn').addEventListener('click', () => openGallery(finalPageScreen));
+
+$('#gallery-back-btn').addEventListener('click', closeGallery);
+
+$('#lightbox-close').addEventListener('click', closeLightbox);
+$('#lightbox-prev').addEventListener('click', (e) => { e.stopPropagation(); stepLightbox(-1); });
+$('#lightbox-next').addEventListener('click', (e) => { e.stopPropagation(); stepLightbox(1); });
+lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+
+// Keyboard: arrows to browse, Esc to close
+document.addEventListener('keydown', (e) => {
+  if (!lightbox.classList.contains('open')) return;
+  if (e.key === 'Escape') { closeLightbox(); }
+  else if (e.key === 'ArrowLeft') { stepLightbox(-1); }
+  else if (e.key === 'ArrowRight') { stepLightbox(1); }
+});
+
+// Keyboard
+window.addEventListener('keydown', (e) => {
+  if (e.repeat) return;
+  state.keys[e.code] = true;
+  if (e.code === 'Escape') {
+    bubble.classList.remove('show');
+  }
+});
+window.addEventListener('keyup', (e) => {
+  state.keys[e.code] = false;
+});
+
+// Touch controls
+document.querySelectorAll('.ctrl-btn').forEach(btn => {
+  const key = btn.dataset.key;
+  const press = (e) => { e.preventDefault(); state.keys[key] = true; };
+  const release = (e) => { e.preventDefault(); state.keys[key] = false; };
+  btn.addEventListener('touchstart', press, { passive: false });
+  btn.addEventListener('touchend', release);
+  btn.addEventListener('mousedown', press);
+  btn.addEventListener('mouseup', release);
+  btn.addEventListener('mouseleave', release);
+});
+
+// Resize
+window.addEventListener('resize', () => {
+  updateCamera();
+  // reposition items vertically to match new viewport
+  document.querySelectorAll('.item').forEach(el => {
+    el.style.bottom = '110px';
+  });
+});
+
+// Start the loop
+requestAnimationFrame(loop);
+
+// Warm up the photo scan in the background so the gallery opens instantly
+if (PHOTO_SETTINGS.autoScan) {
+  const warmUp = () => resolvePhotos();
+  if (window.requestIdleCallback) requestIdleCallback(warmUp, { timeout: 2500 });
+  else setTimeout(warmUp, 400);
+}
+
+// Optional: pre-emptive debug
+console.log('%c💕 Our Love Story loaded 💕', 'color:#d6336c;font-size:18px;font-weight:bold;');
+</script>
+</body>
+</html>
